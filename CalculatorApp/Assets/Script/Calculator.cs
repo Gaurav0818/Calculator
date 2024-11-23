@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 
@@ -30,11 +32,6 @@ public class Calculator : Singleton<Calculator>
         RefreshExpressionsTextUI();
     }
 
-    private void Calculate()
-    {
-        
-    }
-
     private void AddNumber(char c)
     {
         if (_expressionString == "0")
@@ -59,10 +56,19 @@ public class Calculator : Singleton<Calculator>
         return false;
     }
 
+    private bool IsLastCharDecimalNotation()
+    {
+        char lastChar = _expressionString[_expressionString.Length - 1];
+        if (lastChar == '.')
+            return true;
+        
+        return false;
+    }
+
     private void AddOperator(char c)
     {
         if (IsLastValueOperator())
-            return;
+            Backspace();
         
         _expressionString += c;
     }
@@ -76,6 +82,88 @@ public class Calculator : Singleton<Calculator>
     {
         char lastChar = _expressionString[_expressionString.Length - 1];
         return IsOperator(lastChar);
+    }
+    
+    private void Calculate()
+    {
+        char lastChar = _expressionString[_expressionString.Length - 1];
+        if (IsOperator(lastChar))
+            Backspace();
+        
+        List<float> numList = new List<float>();
+        List<Char> opList = new List<char>();
+
+        float num = 0;
+        string currentNum = string.Empty;
+        foreach (char c in _expressionString)
+        {
+            if (IsOperator(c))
+            {
+                numList.Add(float.Parse(currentNum));
+                currentNum = string.Empty;
+
+                opList.Add(c);
+            }
+            else
+            {
+                currentNum += c;
+            }
+        }
+
+        if (!string.IsNullOrEmpty(currentNum))
+        {
+            numList.Add(float.Parse(currentNum));
+        }
+
+        float ans = 0;
+        // Calculate Ans based on numList and opList and in BODMAS order of operation
+        for (int i = 0; i < opList.Count; i++)
+        {
+            if (opList[i] == '*' || opList[i] == '/' || opList[i] == '%')
+            {
+                float result = 0;
+                switch (opList[i])
+                {
+                    case '*':
+                        result = numList[i] * numList[i + 1];
+                        break;
+                    case '/':
+                        result = numList[i] / numList[i + 1];
+                        break;
+                    case '%':
+                        result = numList[i] % numList[i + 1];
+                        break;
+                }
+
+                numList[i] = result;
+                numList.RemoveAt(i+1);
+                opList.RemoveAt(i);
+                i--;
+            }
+        }
+        
+        for (int i = 0; i < opList.Count; i++)
+        {
+            if (opList[i] == '+' || opList[i] == '-')
+            {
+                float result = 0;
+                switch (opList[i])
+                {
+                    case '+':
+                        result = numList[i] + numList[i + 1];
+                        break;
+                    case '-':
+                        result = numList[i] - numList[i + 1];
+                        break;
+                }
+
+                numList[i] = result;
+                numList.RemoveAt(i+1);
+                opList.RemoveAt(i);
+                i--;
+            }
+        }
+        _expressionString = numList[0].ToString();
     }
 
     private void RefreshExpressionsTextUI()

@@ -9,6 +9,11 @@ public class SortBasedOnPreferredRatio : MonoBehaviour
     [SerializeField] private int _padding = 0; 
     void Start()
     {
+        UpdateHeight();
+    }
+
+    private void UpdateHeight()
+    {
         float pHight = transform.GetComponent<RectTransform>().rect.height - 2*_padding;
         for (int i = 0; i < transform.childCount; i++)
         {
