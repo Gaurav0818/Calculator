@@ -18,6 +18,8 @@ public class Calculator : Singleton<Calculator>
 
     public void AddValue(char c)
     {
+        AudioManager.Instance.PlayAudio(c.ToString());
+        
         if(IsOperator(c))
             AddOperator(c);
         else if (c == 'C')
