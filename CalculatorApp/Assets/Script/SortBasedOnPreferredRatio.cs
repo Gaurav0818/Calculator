@@ -7,14 +7,22 @@ public class SortBasedOnPreferredRatio : MonoBehaviour
     [SerializeField] private List<Transform> _lg;
     [SerializeField] private int _ratioCount = 0;
     [SerializeField] private int _padding = 0; 
-    void Start()
+    void OnEnable()
     {
         UpdateHeight();
+        OrientationManager.Instance.OnOrientationChanged += UpdateHeight;
+    }
+    
+    void OnDisable()
+    {
+        OrientationManager.Instance.OnOrientationChanged -= UpdateHeight;
     }
 
     private void UpdateHeight()
     {
         float pHight = transform.GetComponent<RectTransform>().rect.height - 2*_padding;
+     
+        _ratioCount = 0;
         for (int i = 0; i < transform.childCount; i++)
         {
             var child = transform.GetChild(i);

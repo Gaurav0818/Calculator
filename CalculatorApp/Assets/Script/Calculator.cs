@@ -114,9 +114,8 @@ public class Calculator : Singleton<Calculator>
         {
             numList.Add(float.Parse(currentNum));
         }
-
-        float ans = 0;
-        // Calculate Ans based on numList and opList and in BODMAS order of operation
+        
+        
         for (int i = 0; i < opList.Count; i++)
         {
             if (opList[i] == '*' || opList[i] == '/' || opList[i] == '%')
